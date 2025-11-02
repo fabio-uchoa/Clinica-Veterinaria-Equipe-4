@@ -1,0 +1,15 @@
+-- Script de criação das sequências
+
+CREATE SEQUENCE sequence_endereco START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE sequence_animal START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE sequence_alergia START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE sequence_servico START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE sequence_atendimento START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE sequence_medicamento START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE sequence_pagamento START WITH 1 INCREMENT BY 1;
