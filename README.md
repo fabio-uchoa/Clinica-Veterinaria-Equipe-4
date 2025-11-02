@@ -20,12 +20,12 @@ Este repositório contém os scripts SQL do projeto de banco de dados da discipl
 
 As principais entidades modeladas após a normalização são:
 
-- **Pessoa**, **Tutor**, **Veterinário**, **Telefone**
-- **Animal** e **Alergia_Animal**
-- **Serviço** e **Atendimento**
-- **Medicamento**, **Vacina**, **Prescrição**
+- **Pessoa**, **Tutor**, **Veterinario**, **Telefones**
+- **Animal**, **Alergia_Tipo** e **Alergias**
+- **Servico** e **Atendimento**
+- **Medicamento**, **Prescricao**
 - **Pagamento** e **Parcela_Pagamento**
-- **Endereço**
+- **Endereco**
 
 Cada tabela foi normalizada até a **4ª Forma Normal**, garantindo ausência de dependências parciais, transitivas e multivaloradas.
 
