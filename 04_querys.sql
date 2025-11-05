@@ -220,3 +220,155 @@ SELECT
     MIN(data_nascimento) AS Animal_Mais_Velho,
     MAX(data_nascimento) AS Animal_Mais_Novo
 FROM Animal;
+
+--- AVG
+-- Preço médio dos serviços
+SELECT ROUND(AVG(Preco), 2) AS preco_medio
+FROM Servico;
+
+-- Preço médio dos medicamentos
+SELECT ROUND(AVG(preco), 2) AS preco_medio_medicamento
+FROM Medicamento;
+
+-- Peso médio dos animais
+SELECT ROUND(AVG(peso), 2) AS peso_medio_animais
+FROM Animal;
+
+-- COUNT
+
+-- Total de atendimentos
+SELECT COUNT(*) AS total_atendimentos
+FROM Atendimento;
+
+-- Quantidade de espécies distintas
+SELECT COUNT(DISTINCT especie) AS qtde_especies
+FROM Animal;
+
+
+-- LEFT / RIGHT / FULL OUTER JOIN
+
+-- LEFT JOIN: Animais com suas alergias
+SELECT a.id_animal, a.nome_animal, atp.descricao AS alergia
+FROM Animal a
+LEFT JOIN Alergias al     ON al.id_animal = a.id_animal
+LEFT JOIN Alergia_Tipo atp ON atp.id_alergia = al.id_alergia;
+
+-- FULL OUTER JOIN: Atendimentos e Pagamentos
+SELECT COALESCE(a.Id_atendimento, p.id_atendimento) AS id_referencia,
+       a.Id_atendimento AS atendimento,
+       p.id_pagamento AS pagamento
+FROM Atendimento a
+FULL OUTER JOIN Pagamento p
+  ON p.id_atendimento = a.Id_atendimento;
+
+
+-- SUBCONSULTA COM OPERADOR RELACIONAL
+
+-- Serviços mais caros que a média geral
+SELECT Id_servico, Descricao, Preco
+FROM Servico
+WHERE Preco > (SELECT AVG(Preco) FROM Servico);
+
+
+-- 18) SUBCONSULTA COM IN
+
+-- Pessoas que são tutores ATIVOS
+SELECT CPF, nome, email
+FROM Pessoa
+WHERE CPF IN (
+  SELECT CPF_tutor
+  FROM Tutor
+  WHERE status_tutor = 'Ativo'
+);
+
+
+-- SUBCONSULTA COM ANY
+
+-- Pagamentos maiores que QUALQUER pagamento feito via PIX
+SELECT id_pagamento, valor_total
+FROM Pagamento
+WHERE valor_total > ANY (
+  SELECT valor_total
+  FROM Pagamento
+  WHERE forma_pagamento = 'PIX'
+);
+
+
+
+-- SUBCONSULTA COM ALL
+
+-- Serviços mais caros do que TODOS os serviços da categoria 'Estética'
+SELECT Id_servico, Descricao, Preco
+FROM Servico
+WHERE Preco > ALL (
+  SELECT Preco
+  FROM Servico
+  WHERE Tipo_servico = 'Estética'
+);
+
+-- ORDER BY
+
+-- Ordenar animais por espécie (A-Z) e dentro da espécie por peso (maior → menor)
+SELECT nome_animal, especie, peso
+FROM Animal
+ORDER BY especie ASC, peso DESC;
+
+-- GROUP BY
+
+-- Ticket médio por forma de pagamento
+SELECT forma_pagamento,
+       ROUND(AVG(valor_total), 2) AS ticket_medio
+FROM Pagamento
+GROUP BY forma_pagamento
+ORDER BY ticket_medio DESC;
+
+-- HAVING
+
+-- Tipos de serviço com média de preço >= 200
+SELECT Tipo_servico,
+       ROUND(AVG(Preco), 2) AS preco_medio
+FROM Servico
+GROUP BY Tipo_servico
+HAVING AVG(Preco) >= 200
+ORDER BY preco_medio DESC;
+
+-- UNION / INTERSECT / MINUS
+
+-- CPFs que são tutores OU veterinários
+SELECT CPF_tutor AS cpf FROM Tutor
+UNION
+SELECT CPF_veterinario FROM Veterinario;
+
+-- CPFs que existem em Pessoa E Veterinario
+SELECT CPF FROM Pessoa
+INTERSECT
+SELECT CPF_veterinario FROM Veterinario;
+
+-- Pessoas que NÃO são tutores
+SELECT CPF FROM Pessoa
+MINUS
+SELECT CPF_tutor FROM Tutor;
+-
+-- CREATE VIEW
+
+-- View de ticket médio agrupado por espécie de animal
+CREATE OR REPLACE VIEW vw_ticket_medio_por_especie AS
+SELECT an.especie,
+       ROUND(AVG(p.valor_total), 2) AS ticket_medio
+FROM Pagamento p
+JOIN Atendimento a ON a.Id_atendimento = p.id_atendimento
+JOIN Animal an     ON an.id_animal     = a.id_animal
+GROUP BY an.especie;
+
+-- Como usar a view:
+-- SELECT * FROM vw_ticket_medio_por_especie ORDER BY ticket_medio DESC;
+
+-- GRANT / REVOKE (Explicação)
+
+-- GRANT: dá permissão a outro usuário
+-- EXEMPLO:
+-- GRANT SELECT ON vw_ticket_medio_por_especie TO ANALISTA;
+
+-- REVOKE: remove permissão
+-- EXEMPLO:
+-- REVOKE SELECT ON vw_ticket_medio_por_especie FROM ANALISTA;
